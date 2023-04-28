@@ -60,14 +60,26 @@
     color: blue;
   }
 
-  @import url('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css');
-
-  /* 针对不同屏幕大小设置样式 */
-  @media screen and (max-width: 480px) {
-      .main {
-        width: 100%;
-      }
+  @media (max-width: 768px) {
+    .container {
+    width: 90%;
+    margin: 0 auto;
     }
+    .container1 {
+      font-size: 0.8em;
+    }
+  }
+  
+  /* 当屏幕宽度大于768像素时 */
+  @media (min-width: 769px) {
+    .container {
+    width: 70%;
+    margin: 0 auto;
+    }
+    .container1 {
+      font-size: 1.2em;
+    }
+  }
 
   </style>
 
@@ -77,7 +89,7 @@
 <body class="w3-content" style="max-width:100%;">
 
 <!-- Sidebar/menu -->
-<nav class="w3-container w3-center gray-box" style="z-index:3;padding: 18px;margin-bottom: 5px;" id="mySidebar">
+<nav class="w3-container container1 w3-center gray-box" style="z-index:3;padding: 18px;margin-bottom: 5px;" id="mySidebar">
   <div class="w3-large" style="font-weight:bold">
     <a style="font-weight: bold; font-size: 1.2em; text-decoration: none; color: #633869;margin-right: 20px">Yixiang Fang</a>
     <a>|</a>
@@ -96,7 +108,7 @@
 
 
 <!-- !PAGE CONTENT! -->
-<div class="w3-main" style="max-width:800pt;text-align: center;margin: 0 auto;">
+<div class="w3-main container" style="max-width:800pt;text-align: center;margin: 0 auto;">
 
   <!-- Push down content on small screens -->
   <!-- <div class="w3-hide-large" style="margin-top:83px"></div> -->
