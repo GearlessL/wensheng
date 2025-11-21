@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wensheng Luo - Academic Homepage</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Tailwind Configuration for Dark Mode -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background-color: #475569;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #94a3b8;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background-color: #64748b;
+        }
+
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        // --- Icons ---
+        const IconBase = ({ children, size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
+        );
+
+        const Github = (props) => <IconBase {...props}><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></IconBase>;
+        const Mail = (props) => <IconBase {...props}><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></IconBase>;
+        const MapPin = (props) => <IconBase {...props}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></IconBase>;
+        const ExternalLink = (props) => <IconBase {...props}><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></IconBase>;
+        const BookOpen = (props) => <IconBase {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></IconBase>;
+        const Award = (props) => <IconBase {...props}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></IconBase>;
+        const Cpu = (props) => <IconBase {...props}><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></IconBase>;
+        const Network = (props) => <IconBase {...props}><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></IconBase>;
+        const ChevronRight = (props) => <IconBase {...props}><path d="m9 18 6-6-6-6"/></IconBase>;
+        const ChevronDown = (props) => <IconBase {...props}><path d="m6 9 6 6 6-6"/></IconBase>;
+        const ChevronUp = (props) => <IconBase {...props}><path d="m18 15-6-6-6 6"/></IconBase>;
+        const Menu = (props) => <IconBase {...props}><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></IconBase>;
+        const X = (props) => <IconBase {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></IconBase>;
+        const Globe = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></IconBase>;
+        const Users = (props) => <IconBase {...props}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></IconBase>;
+        const Sun = (props) => <IconBase {...props}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></IconBase>;
+        const Moon = (props) => <IconBase {...props}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></IconBase>;
+        const Languages = (props) => <IconBase {...props}><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></IconBase>;
+        const Calendar = (props) => <IconBase {...props}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></IconBase>;
+
+        // --- I18n & Data ---
+
+        const I18N = {
+            en: {
+                role: "Assistant Professor",
+                university: "Hunan University",
+                location: "Changsha, China",
+                about: "About Me",
+                publications: "Publications",
+                services: "Academia Services",
+                contact: "Contact",
+                showAll: "Show All Publications",
+                showLess: "Show Less",
+                viewScholar: "View full list on Google Scholar",
+                abstract: "Abstract",
+                doi: "DOI",
+                interests: {
+                    graph: "Graph Data Mining",
+                    parallel: "Parallel Computing",
+                    algo: "Algorithms"
+                },
+                bio: (
+                    <>
+                        <p className="mb-4">
+                            I am currently an Assistant Professor in the College of Computer Science and Engineering at Hunan University. Prior to this, I was a Postdoctoral Fellow in the School of Data Science at the Chinese University of Hong Kong, Shenzhen (CUHK-SZ), working with <a href="https://fangyixiang.github.io/" target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">Prof. Yixiang Fang</a>.
+                        </p>
+                        <p className="mb-4">
+                            During my time there, I also had the privilege of collaborating with <a href="https://chenhao-ma.github.io/" target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">Prof. Chenhao Ma</a> and the highly talented PhD candidate <a href="https://jaylzhou.github.io/" target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">Yingli Zhou</a>.
+                        </p>
+                        <p>
+                            My research interests include Big Data Processing and Parallel Computing. I specifically focus on Graph Data Management (Cohesive Subgraph Search and Maintenance) and Matrix Multiplication/Decomposition algorithms in High-Performance Parallel Computing.
+                        </p>
+                    </>
+                ),
+                footer: "Built with React & Tailwind CSS",
+                copyright: "All rights reserved."
+            },
+            zh: {
+                role: "助理教授",
+                university: "湖南大学",
+                location: "中国 长沙",
+                about: "个人简介",
+                publications: "发表论文",
+                services: "学术服务",
+                contact: "联系方式",
+                showAll: "显示所有论文",
+                showLess: "收起论文列表",
+                viewScholar: "查看 Google Scholar 完整列表",
+                abstract: "摘要",
+                doi: "原文链接",
+                interests: {
+                    graph: "图数据挖掘",
+                    parallel: "并行计算",
+                    algo: "算法研究"
+                },
+                bio: (
+                    <>
+                        <p className="mb-4">
+                            目前担任湖南大学信息科学与工程学院助理教授。在此之前，我在香港中文大学（深圳）数据科学学院担任博士后研究员，合作导师为 <a href="https://fangyixiang.github.io/" target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">方一向教授</a>。
+                        </p>
+                        <p className="mb-4">
+                            在此期间，我也有幸与 <a href="https://chenhao-ma.github.io/" target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">马晨昊教授</a> 以及优秀的博士生 <a href="https://jaylzhou.github.io/" target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">周盈利</a> 进行了紧密合作。
+                        </p>
+                        <p>
+                            主要从事大数据处理与并行计算的研究。专注于图数据管理（特别是凝聚子图搜索与维护），以及高性能并行计算领域的矩阵乘法与分解算法优化。
+                        </p>
+                    </>
+                ),
+                footer: "基于 React & Tailwind CSS 构建",
+                copyright: "版权所有"
+            }
+        };
+
+        const PROFILE = {
+            name: "Wensheng Luo",
+            nameZh: "罗文晟",
+            universityUrl: "https://www.hnu.edu.cn/",
+            email: "luowensheng@hnu.edu.cn",
+            github: "https://github.com/GearlessL",
+            scholar: "https://scholar.google.com/citations?user=yOkP8LAAAAAJ", 
+            avatar: "Wensheng.jpg",
+        };
+
+        const SERVICES_DATA = {
+            pcMembers: [
+                "ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD): 2025",
+                "ACM Conference on Information and Knowledge Management (CIKM): 2024, 2025",
+                "ACM International Conference on Multimedia (MM): 2025",
+                "ACM SIGMOD - Availability & Reproducibility Initiative (SIGMOD ARI): 2025"
+            ],
+            reviewers: [
+                "IEEE Transactions on Mobile Computing (TMC)",
+                "ACM Transactions on Knowledge Discovery from Data (TKDD)",
+                "IEEE Internet of Things Journal (IoTJ)",
+                "Data Mining and Knowledge Discovery (DMKD)",
+                "Information Sciences",
+                "World Wide Web Journal (WWWJ)",
+                "Knowledge and Information Systems (KAIS)"
+            ]
+        };
+
+        // --- 论文数据 ---
+        const PUBLICATIONS = [
+            {
+                title: "Searching and Detecting Structurally Similar Communities in Large Heterogeneous Information Networks",
+                authors: "Shu Wang, Yixiang Fang, Wensheng Luo",
+                venue: "PVLDB 2025, 18(5): 1425-1438",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "Scalable Graph-based Retrieval-Augmented Generation via Locality-Sensitive Hashing",
+                authors: "Fangyuan Zhang, Zhengjun Huang, Yingli Zhou, Qingtian Guo, Wensheng Luo, Xiaofang Zhou",
+                venue: "LLM+Graph@VLDB 2025",
+                tag: "Workshop",
+                link: "#"
+            },
+            {
+                title: "Efficiently Counting Triangles in Large Temporal Graphs",
+                authors: "Yuyang Xia, Yixiang Fang, Wensheng Luo",
+                venue: "SIGMOD 2025, 3(1):38:1-38:27",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "Accelerating Skyline Path Enumeration with a Core Attribute Index on Multi-attribute Graphs",
+                authors: "Yuanyuan Zeng, Yixiang Fang, Wensheng Luo, Chenhao Ma",
+                venue: "SIGMOD 2025, 3(3):124:1-124:1:26",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "Accelerating maximum biplex search over large bipartite graphs",
+                authors: "Dong Pan, Xu Zhou, Wensheng Luo*, Zhibang Yang, Qing Liu, Yunjun Gao, Kenli Li",
+                venue: "The VLDB Journal 2025, 34(1): 1",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "Efficient Parallel D-core Decomposition at Scale",
+                authors: "Wensheng Luo, Yixiang Fang, Chunxu Lin, Yingli Zhou",
+                venue: "PVLDB 2024, 17(10): 2654-2667",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "On Efficient Large Sparse Matrix Chain Multiplication",
+                authors: "Chunxu Lin, Wensheng Luo*, Yixiang Fang, Chenhao Ma, Xilin Liu, Yuchi Ma",
+                venue: "SIGMOD 2024, 2(3): 119:2-119:27",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "Trajectory-Aware Task Coalition Assignment in Spatial Crowdsourcing (Extended Abstract)",
+                authors: "Yuan Xie, Fan Wu, Xu Zhou, Wensheng Luo, Yifang Yin, Roger Zimmermann, Keqin Li, Kenli Li",
+                venue: "ICDE 2024",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "Trajectory-aware Task Coalition Assignment in Spatial Crowdsourcing",
+                authors: "Yuan Xie, Fan Wu, Xu Zhou, Wensheng Luo, Yifang Yin, Roger Zimmermann, Keqin Li, Kenli Li",
+                venue: "IEEE TKDE 2024",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "Efficient Core Maintenance in Large Bipartite Graphs",
+                authors: "Wensheng Luo, Qiaoyuan Yang, Yixiang Fang, Xu Zhou",
+                venue: "SIGMOD 2024",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "On Querying Spanned Connected Components in Large Temporal Graphs",
+                authors: "Haoxuan Xie, Yixiang Fang, Yuyang Xia, Wensheng Luo, Chenhao Ma",
+                venue: "SIGMOD 2023, 170:1-170:27",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "Influential Community Search over Large Heterogeneous Information Networks",
+                authors: "Yingli Zhou, Yixiang Fang, Wensheng Luo, Yunming Ye",
+                venue: "PVLDB 2023, 16(8): 2047-2060",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "Scalable Algorithms for Densest Subgraph Discovery",
+                authors: "Wensheng Luo, Zhuo Tang, Yixiang Fang, Chenhao Ma, Xu Zhou",
+                venue: "ICDE 2023, 287-300",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "Efficient Influential Community Search in Large Uncertain Graphs.",
+                authors: "Wensheng Luo, Xu Zhou, Kenli Li, Yunjun Gao, Keqin Li",
+                venue: "IEEE TKDE 2023, 35(4): 3779-3793",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "Densest Subgraph Discovery on Large Graphs: Applications, Challenges, and Techniques",
+                authors: "Yixiang Fang, Wensheng Luo, Chenhao Ma",
+                venue: "PVLDB 2022, 15(12): 3766-3769",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "Maximum Biplex Search over Bipartite Graphs",
+                authors: "Wensheng Luo, Kenli Li, Xu Zhou, Yunjun Gao, Keqin Li",
+                venue: "ICDE 2022, 898-910",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "Personalized query techniques in graphs: A survey",
+                authors: "Peiying Lin, Yangfan Li, Wensheng Luo, Xu Zhou, Yuanyuan Zeng, Kenli Li, Keqin Li",
+                venue: "Information Sciences 2022, 607: 961-1000",
+                tag: "CCF-B", 
+                link: "#"
+            },
+            {
+                title: "An Efficient Index-Based Approach to Distributed Set Reachability on Small-World Graphs",
+                authors: "Yuanyuan Zeng, Kenli Li, Xu Zhou, Wensheng Luo, Yunjun Gao",
+                venue: "IEEE TPDS 2022, 33(10): 2358-2371",
+                tag: "CCF-A",
+                link: "#"
+            },
+            {
+                title: "K-truss community most favorites query based on top-t",
+                authors: "ZhiBang Yang, Xiaoxue Li, Xu Zhang, Wensheng Luo, Kenli Li",
+                venue: "World Wide Web 2022, 25(2): 949-969",
+                tag: "CCF-B",
+                link: "#"
+            },
+            {
+                title: "Efficient Approaches to Top-r Influential Community Search",
+                authors: "Wensheng Luo, Xu Zhou, Jianye Yang, Peng Peng, Guoqing Xiao, Yunjun Gao",
+                venue: "IEEE IoTJ 2021, 8(16): 12650-12657",
+                tag: "SCI-1",
+                link: "#"
+            }
+        ];
+
+        // --- Components ---
+
+        const Tag = ({ children, type }) => {
+            const colors = {
+                "CCF-A": "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
+                "CCF-B": "bg-teal-100 text-teal-700 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800",
+                "SCI-1": "bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800",
+                "Workshop": "bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800",
+                "Journal": "bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800",
+                "Preprint": "bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700",
+                "default": "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
+            };
+            const style = colors[type] || colors["default"];
+            return (
+                <span className={`px-2.5 py-0.5 rounded-md text-xs font-semibold border ${style} inline-flex items-center`}>
+                    {children}
+                </span>
+            );
+        };
+
+        const SectionTitle = ({ children, icon: IconComponent }) => (
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-8 flex items-center gap-3 border-b border-slate-200 dark:border-slate-700 pb-3">
+                <div className="p-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
+                    {IconComponent && <IconComponent size={24} />}
+                </div>
+                {children}
+            </h2>
+        );
+
+        const PublicationItem = ({ pub, texts, index, showYear, year }) => {
+            // Tag colors for left border
+            const borderColors = {
+                "CCF-A": "border-blue-500",
+                // "CCF-B": "border-teal-500",
+                // "SCI-1": "border-indigo-500", // Removed per user request
+                // "Workshop": "border-purple-500", // Removed per user request
+                // "Journal": "border-emerald-500", // Removed per user request
+                "default": "border-slate-200 dark:border-slate-700" // Neutral gray for others
+            };
+            const activeBorder = borderColors[pub.tag] || borderColors["default"];
+
+            return (
+                <div className="mb-2 py-4 relative"> {/* Increased gap (mb-6 -> mb-10) */}
+                    {/* Year Indicator */}
+                    {showYear && (
+                        <div className="flex items-center gap-3 mb-6 mt-20 first:mt-0"> {/* Increased year gap (mt-8 -> mt-20) */}
+                            <div className="flex items-center justify-center w-14 h-8 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-sm shadow-inner">
+                                {year}
+                            </div>
+                            <div className="h-px bg-slate-200 dark:bg-slate-800 flex-grow"></div>
+                        </div>
+                    )}
+
+                    {/* Card */}
+                    <div className={`group relative bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 overflow-hidden pl-5 border-l-4 ${activeBorder}`}>
+                        
+                        {/* Index Number Badge (Absolute Top Left of Card Content) */}
+                        <div className="absolute right-4 top-4 text-xs font-mono text-slate-300 dark:text-slate-600 select-none">
+                            #{index + 1}
+                        </div>
+
+                        <div className="pr-8">
+                            {/* Title */}
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 leading-snug mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                <a href={pub.link} className="block">
+                                    {pub.title}
+                                </a>
+                            </h3>
+
+                            {/* Authors */}
+                            <p className="text-slate-600 dark:text-slate-400 text-sm mb-3 leading-relaxed">
+                                {pub.authors.split(', ').map((author, i, arr) => {
+                                    const cleanAuthor = author.trim();
+                                    const isMe = /Wensheng Luo\*?/i.test(cleanAuthor) || /W Luo\*?/i.test(cleanAuthor);
+                                    return (
+                                        <span key={i} className={isMe ? "font-bold text-slate-900 dark:text-slate-100 underline decoration-blue-200 dark:decoration-blue-800 underline-offset-2" : ""}>
+                                            {cleanAuthor}{i < arr.length - 1 ? ", " : ""}
+                                        </span>
+                                    );
+                                })}
+                            </p>
+
+                            {/* Venue & Actions Row */}
+                            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-50 dark:border-slate-700/50 mt-2">
+                                <div className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+                                    <BookOpen size={14} className="text-blue-500/70" />
+                                    <span className="italic">{pub.venue}</span>
+                                </div>
+                                
+                                <div className="flex items-center gap-3">
+                                    <Tag type={pub.tag}>{pub.tag}</Tag>
+                                    
+                                    <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+                                    
+                                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                        <button className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-blue-600 transition-colors" title={texts.abstract}>
+                                            <ExternalLink size={14} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Helper to extract year ---
+        const getYear = (venue) => {
+            const match = venue.match(/(20\d{2})/);
+            return match ? match[0] : 'Unknown';
+        };
+
+        // --- Main Application ---
+
+        function PersonalWebsite() {
+            const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+            const [showAllPublications, setShowAllPublications] = useState(false);
+            const [lang, setLang] = useState('en');
+            const [isDark, setIsDark] = useState(false);
+
+            const t = I18N[lang];
+            const displayedPublications = showAllPublications ? PUBLICATIONS : PUBLICATIONS.slice(0, 5);
+
+            useEffect(() => {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    setIsDark(true);
+                }
+            }, []);
+
+            useEffect(() => {
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }, [isDark]);
+
+            const toggleTheme = () => setIsDark(!isDark);
+            const toggleLang = () => setLang(prev => prev === 'en' ? 'zh' : 'en');
+
+            const NavLink = ({ href, children }) => (
+                <a 
+                    href={href}
+                    className="block px-4 py-2 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                >
+                    {children}
+                </a>
+            );
+
+            return (
+                <div className="min-h-screen font-sans selection:bg-blue-200 dark:selection:bg-blue-900">
+                    {/* Top Right Controls */}
+                    <div className="fixed top-4 right-4 z-50 flex gap-2">
+                        <button 
+                            onClick={toggleLang}
+                            className="group relative p-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur shadow-md hover:bg-white dark:hover:bg-slate-700 transition-all text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                            title="Switch Language"
+                        >
+                            <Languages size={20} />
+                            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs bg-slate-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">
+                                {lang === 'en' ? '中文' : 'English'}
+                            </span>
+                        </button>
+                        <button 
+                            onClick={toggleTheme}
+                            className="p-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur shadow-md hover:bg-white dark:hover:bg-slate-700 transition-all text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                            title="Toggle Theme"
+                        >
+                            {isDark ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
+                    </div>
+
+                    {/* Mobile Header */}
+                    <div className="lg:hidden fixed top-0 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-40 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex justify-between items-center">
+                        <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">
+                            {lang === 'en' ? PROFILE.name : PROFILE.nameZh}
+                        </span>
+                        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-slate-600 dark:text-slate-300">
+                            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
+                    </div>
+
+                    {/* Mobile Menu */}
+                    {isMobileMenuOpen && (
+                        <div className="lg:hidden fixed inset-0 z-30 bg-white dark:bg-slate-900 pt-20 px-6 space-y-4">
+                            <NavLink href="#about">{t.about}</NavLink>
+                            <NavLink href="#publications">{t.publications}</NavLink>
+                            <NavLink href="#services">{t.services}</NavLink>
+                        </div>
+                    )}
+
+                    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 lg:pt-24 pb-12">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                        
+                        {/* Left Sidebar */}
+                        <aside className="lg:col-span-4 relative">
+                            <div className="lg:sticky lg:top-24 space-y-8">
+                            
+                            {/* Profile Info */}
+                            <div className="text-center lg:text-left">
+                                <div className="w-64 h-64 mx-auto lg:mx-0 bg-white dark:bg-slate-800 rounded-2xl mb-6 overflow-hidden shadow-xl border-4 border-white dark:border-slate-700 relative group cursor-pointer">
+                                <img 
+                                    src={PROFILE.avatar}
+                                    alt="Wensheng Luo" 
+                                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                    onError={(e) => {
+                                    e.target.onerror = null; 
+                                    e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='5'/%3E%3Cpath d='M20 21a8 8 0 0 0-16 0'/%3E%3C/svg%3E";
+                                    }}
+                                />
+                                </div>
+                                
+                                <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
+                                {lang === 'en' ? PROFILE.name : PROFILE.nameZh}
+                                </h1>
+                                <p className="text-lg text-blue-600 dark:text-blue-400 font-medium mb-4">
+                                {t.role}
+                                </p>
+                                
+                                <div className="space-y-3 text-sm text-slate-600 dark:text-slate-400">
+                                <div className="flex items-center justify-center lg:justify-start gap-2">
+                                    <Award className="w-4 h-4 shrink-0" />
+                                    <a href={PROFILE.universityUrl} className="hover:text-blue-600 transition-colors">{t.university}</a>
+                                </div>
+                                <div className="flex items-center justify-center lg:justify-start gap-2">
+                                    <MapPin className="w-4 h-4 shrink-0" />
+                                    <span>{t.location}</span>
+                                </div>
+                                <div className="flex items-center justify-center lg:justify-start gap-2">
+                                    <Mail className="w-4 h-4 shrink-0" />
+                                    <a href={`mailto:${PROFILE.email}`} className="hover:text-blue-600 transition-colors">{PROFILE.email}</a>
+                                </div>
+                                </div>
+                            </div>
+
+                            {/* Social Links */}
+                            <div className="flex justify-center lg:justify-start gap-4">
+                                <a href={`mailto:${PROFILE.email}`} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400 transition-all" aria-label="Email">
+                                <Mail size={20} />
+                                </a>
+                                <a href={PROFILE.github} target="_blank" rel="noreferrer" className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-all" aria-label="GitHub">
+                                <Github size={20} />
+                                </a>
+                                <a href={PROFILE.scholar} target="_blank" rel="noreferrer" className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400 transition-all" aria-label="Google Scholar">
+                                <Award size={20} />
+                                </a>
+                            </div>
+
+                            {/* Desktop Nav */}
+                            <nav className="hidden lg:block space-y-1 border-l border-slate-200 dark:border-slate-800 pl-4 ml-2">
+                                <a href="#about" className="flex items-center gap-2 py-1 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600"></span> {t.about}
+                                </a>
+                                <a href="#publications" className="flex items-center gap-2 py-1 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600"></span> {t.publications}
+                                </a>
+                                <a href="#services" className="flex items-center gap-2 py-1 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600"></span> {t.services}
+                                </a>
+                            </nav>
+                            </div>
+                        </aside>
+
+                        {/* Main Content */}
+                        <main className="lg:col-span-8 space-y-16">
+                            
+                            {/* About Section */}
+                            <section id="about" className="scroll-mt-24 animate-fade-in">
+                                <SectionTitle icon={Globe}>{t.about}</SectionTitle>
+                                <div className="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-300">
+                                    {t.bio}
+                                </div>
+                                
+                                <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    {[
+                                    { icon: Network, label: t.interests.graph },
+                                    { icon: Cpu, label: t.interests.parallel },
+                                    { icon: BookOpen, label: t.interests.algo }
+                                    ].map((item, idx) => (
+                                    <div key={idx} className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+                                        <item.icon className="w-6 h-6 text-blue-500" />
+                                        <span className="font-medium text-slate-700 dark:text-slate-200">{item.label}</span>
+                                    </div>
+                                    ))}
+                                </div>
+                            </section>
+
+                            {/* Publications Section */}
+                            <section id="publications" className="scroll-mt-24">
+                                <div className="flex justify-between items-center mb-6 pb-2">
+                                    <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-3">
+                                        <div className="p-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
+                                            <BookOpen size={24} />
+                                        </div>
+                                        {t.publications}
+                                        <span className="text-sm font-normal text-slate-400 ml-1 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                                            {PUBLICATIONS.length}
+                                        </span>
+                                    </h2>
+                                </div>
+
+                                <div className="space-y-0 relative">
+                                    {displayedPublications.map((pub, index) => {
+                                        // 自动检测年份变化
+                                        const year = getYear(pub.venue);
+                                        const prevYear = index > 0 ? getYear(displayedPublications[index - 1].venue) : null;
+                                        const showYear = year !== prevYear;
+
+                                        return (
+                                            <PublicationItem 
+                                                key={index} 
+                                                pub={pub} 
+                                                texts={t} 
+                                                index={index} 
+                                                showYear={showYear}
+                                                year={year}
+                                            />
+                                        );
+                                    })}
+
+                                    {/* Mask for collapsed view */}
+                                    {!showAllPublications && (
+                                        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-slate-50 via-slate-50/90 to-transparent dark:from-slate-950 dark:via-slate-950/90 dark:to-transparent flex items-end justify-center pb-6 pointer-events-none">
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Toggle Button */}
+                                <div className="mt-8 text-center">
+                                    <button 
+                                    onClick={() => setShowAllPublications(!showAllPublications)}
+                                    className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:bg-blue-50 dark:hover:bg-slate-700 hover:border-blue-200 hover:text-blue-600 dark:hover:text-blue-400 transition-all shadow-sm z-10 relative"
+                                    >
+                                    {showAllPublications ? (
+                                        <>{t.showLess} <ChevronUp size={16} className="group-hover:-translate-y-0.5 transition-transform" /></>
+                                    ) : (
+                                        <>{t.showAll} <ChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform" /></>
+                                    )}
+                                    </button>
+                                </div>
+
+                                <div className="mt-8 text-center">
+                                    <a href={PROFILE.scholar} className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                                        {t.viewScholar} <ChevronRight size={16} />
+                                    </a>
+                                </div>
+                            </section>
+
+                            {/* Services Section */}
+                            <section id="services" className="scroll-mt-24">
+                                <SectionTitle icon={Users}>{t.services}</SectionTitle>
+                                
+                                <div className="space-y-8">
+                                    <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-100 dark:border-slate-700 shadow-sm">
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+                                        <div className="w-1.5 h-5 bg-blue-500 rounded-full"></div>
+                                        Conference Program Committee Members
+                                    </h3>
+                                    <ul className="space-y-3">
+                                        {SERVICES_DATA.pcMembers.map((item, i) => (
+                                        <li key={i} className="flex gap-3 text-slate-600 dark:text-slate-300 leading-relaxed">
+                                            <span className="text-blue-500 mt-1.5">•</span>
+                                            <span>{item}</span>
+                                        </li>
+                                        ))}
+                                    </ul>
+                                    </div>
+
+                                    <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-100 dark:border-slate-700 shadow-sm">
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+                                        <div className="w-1.5 h-5 bg-teal-500 rounded-full"></div>
+                                        Journal Reviewers
+                                    </h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {SERVICES_DATA.reviewers.map((item, i) => (
+                                        <span key={i} className="inline-block px-3 py-1.5 bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-200 rounded-lg text-sm border border-slate-200 dark:border-slate-600 hover:border-blue-300 dark:hover:border-blue-500 transition-colors cursor-default">
+                                            {item}
+                                        </span>
+                                        ))}
+                                    </div>
+                                    </div>
+                                </div>
+                            </section>
+                            
+                            {/* Footer */}
+                            <footer className="pt-12 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center text-sm text-slate-500 dark:text-slate-400">
+                                <p>© {new Date().getFullYear()} {lang === 'en' ? PROFILE.name : PROFILE.nameZh}. {t.copyright}</p>
+                                <p>{t.footer}</p>
+                            </footer>
+
+                        </main>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- Mount ---
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PersonalWebsite />);
+    </script>
+</body>
+</html>
